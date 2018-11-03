@@ -1,1 +1,32 @@
+Diseño de sistemas empotrados
+Proyecto:
 
+Brazo robot.
+	Mi propuesta es, basándonos en unos cuantos proyectos que he visto y colocare los enlaces al final, hacer un brazo robótico programable, de fabricación casera con materiales como cartón, cartón pluma y/o maderas ligeras, para abaratar costes, también podríamos  implementar una aplicación para el manejo del mismo, el movimiento del brazo robótico se explica mejor con los vídeos de los distintos proyectos, la única decisión importante es si implementar pinza de agarre o no.
+
+	Los materiales necesarios para el mismo serian:
+Cartón/Cartón pluma/Madera para la estructura.
+Servomotores para accionar los movimientos.
+Placa arduino para controlarlo.
+Cableado.
+Fuente de energía. (Si lo hacemos portátil e independiente de enchufes)
+Placa base. (La blanca para el cableado)
+Resistencias.
+Botones.
+Leds.
+Pistola de cola caliente / Pegamentos / Cola blanca.
+Software de Arduino.
+
+	Enlaces de interés: 
+	Brazo robótico programable de cartón, sin pinza: https://www.hackster.io/ChanR19/simple-programmable-robotic-arm-bd28a0
+	Brazo robótico de madera, con pinza y acelerómetro: https://www.hackster.io/noname/robot-arm-with-arm-with-arduino-101-708a46
+	Acelerómetro con arduino: https://www.hackster.io/jeffpar0721/accelerometer-using-arduino-101-2952cf
+	
+
+
+	Incluyendo cosas de los distintos proyectos podemos hacer un brazo programable con materiales baratos, que pueda mover cosas. 
+
+Opcional:
+Una vez terminado podemos incluir más funcionalidades, como reconocimiento de formas mediante imagen, para eliminación de residuos, por ejemplo, como se muestra aquí:
+
+	https://www.hackster.io/wittkonrad/robotic-arm-arduino-matlab-be8fa6
