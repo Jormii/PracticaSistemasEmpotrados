@@ -42,7 +42,7 @@ void loop()
       break;
   }
 
-  for (int pin_led = N_LEDS; pin_led >= 0; pin_led--)
+  for (int pin_led = N_LEDS - 1; pin_led >= 0; pin_led--)
   {
     int k = valor >> pin_led;
     digitalWrite(PINS_LED[pin_led], k & 1);
