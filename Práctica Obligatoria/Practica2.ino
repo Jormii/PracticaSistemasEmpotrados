@@ -1,26 +1,27 @@
+const int PIN_LDR = 0;  // El LDR usa una resistencia de 10 kohmios
 
-// Usamos resistencias de 220 ohmios para los LEDs y de 10 kOhmiospara el sensor de luminosidad.
-int sensor = 0; // LDR
-int val = 0; // Valor devuelto por el LDR
-int nivel = 0;
-int led[] = {2, 3, 4, 5};
+const int PINS_LED[] = { 2, 3, 4, 5 };   // Los LEDs usan resistencias de 220 ohmios
+const int N_LEDS = 4;
 int valor = 0;
-void setup() {
+
+void setup()
+{
   // Establecemos todas las conexiones de los LEDS como salidas
-  for (int i = 0; i < 4; i++)
+  for (int pin_led = 0; pin_led != N_LEDS; ++pin_led)
   {
-    pinMode(led[i] , OUTPUT);
+    pinMode(PINS_LED[pin_led], OUTPUT);
   }
 
-  Serial.begin(9600); // Abrimos la comunicación serie
+  Serial.begin(9600); // Abrimos la comunicación serie para debug
 }
 
-void loop() {
-  val = analogRead(sensor); // Leemos el sensor de luminosidad
-  // Calculamos cuántos512 LEDs deben encenderse. Recordemos que lamedida del sensor va de 0 a 1023 y tenemos 10 LEDs.
-  nivel = floor(val / 256); // Elegimos 4 niveles
+void loop()
+{
+  int lectura_LDR = analogRead(PIN_LDR);  // Leemos el LDR
+  // Calculamos cuántos LEDs deben encenderse
+  int nivel = floor(lectura_LDR / 256); // Elegimos 4 niveles
 
-  randomSeed(val);
+  randomSeed(lectura_LDR);
 
   switch (nivel)
   {
@@ -41,22 +42,21 @@ void loop() {
       break;
   }
 
-  for (int c = 3; c >= 0; c--)
+  for (int pin_led = N_LEDS; pin_led >= 0; pin_led--)
   {
-    int k = valor >> c;
-    digitalWrite(led[c], k & 1);
+    int k = valor >> pin_led;
+    digitalWrite(PINS_LED[pin_led], k & 1);
   }
 
-  Serial.println(val);
+  Serial.println(lectura_LDR);
   Serial.println(nivel);
   Serial.println(valor);
   Serial.println();
 
-  delay(100);
-  for (int i = 0; i < 4; i++)
+  delay(200);
+  for (int pin_led = 0; pin_led != N_LEDS; ++pin_led)
   {
-    digitalWrite(led[i], LOW);
+    digitalWrite(PINS_LED[pin_led], LOW);
   }
-  delay(100);
-
+  // delay(200);
 }
