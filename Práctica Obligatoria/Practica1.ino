@@ -1,7 +1,7 @@
 const int PINS_LED[] = { 13, 12, 11, 10 };
 const int N_PINS = 4;
 const int MIN_VALOR = 0;
-const int MAX_VALOR = (int)pow(4, 2) - 1;
+const int MAX_VALOR = (int)pow(N_PINS, 2) - 1;
 int contador = MIN_VALOR;
 
 const int PIN_BOTON = 2;
