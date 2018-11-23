@@ -21,14 +21,13 @@ const char PIN_BOTON = 8;
  * Variables de control del pintando
  */
 const double TIEMPO_PINTADO = 0.0;          // Tiempo necesario para realizar el pintando
-const double TIEMPO_ITERACION = 0.0;        /* Incremento del tiempo en cada iteracion en la
-                                            funcion pintado_f() */
 const short TIEMPO_FINALIZACION = 200;      /* Delay utilizado al final del pintado para garantizar
                                             que los servos vuelven a su posicion por defecto */
 
 /**
  * Constantes para los servos
  */
+const unsigned char ANGULO_POR_MS = 0;
 const unsigned int ANGULO_BASE_ROTACION = 0;    /* Angulo total que debe recorrer la base hasta
                                                 que finaliza el pintado */
 const char ANGULO_BASE_DEFECTO = 0;             // Angulo por defecto de la base
@@ -92,9 +91,10 @@ void (*funciones_estados[n_estados])() = {inicio_f, listo_f, en_espera_f, pintan
                                           bloqueado_f, terminado_f, error_f};
 char estado = inicio;               // Almacena el estado actual de la maquina
 char inicializado = 0;              // 0: El sistema no se ha inicializado. 1: Si lo ha hecho
-short lectura_LDR = 0;              // Valor leido por el LDR
-double tiempo_ejecucion = -1.0;     // Tiempo que lleva pintando la maquina
 /// Objetos para el control de los motores
 Servo servo_base;
 Servo servo_spray;
 Servo servo_brazo;
+unsigned int base_angulo_actual = 0;    // Angulo recorrido por el motor de la base en el pintado
+unsigned int brazo_angulo_actual = 0;   // Angulo recorrido por el motor del brazo en el pintado
+char signo_brazo = 1;                   // 1 ó -1. Para mover el brazo de arriba a abajo
