@@ -50,8 +50,8 @@ const int ZUMBADOR_FRECUENCIA = 0;              // Frecuencia del sonido emitido
 /**
  * Valores de control del LDR
  */
-const short LDR_HAY_LUZ = 0;                // Valor umbral que indica si se percibe luz
-const short LDR_NO_HAY_LUZ = 1;             // Valor umbral que indica si no se percibe luz
+const short LDR_HAY_LUZ = 250;              // Valor umbral que indica si se percibe luz
+const short LDR_NO_HAY_LUZ = 40;            // Valor umbral que indica si no se percibe luz
 const short DELAY_BLOQUEADO = 500;          /* Cuanto delay se realiza dentro de bloqueado_f(),
                                             con el objetivo de no leer constantemente el LDR */
 

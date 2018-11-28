@@ -100,7 +100,7 @@ void pintando_f()
         }
 
         elapsed_ms = (tF - t0) / 1000;  // Se calcula el tiempo transcurrido
-        t_ejecucion += elapsed_ms;       // Se actualiza el tiempo de ejecucion
+        t_ejecucion += elapsed_ms;       // Se actualiza el tiempo de ejecucion. ¿Precision adecuada?
 
         t0 = micros();
 
