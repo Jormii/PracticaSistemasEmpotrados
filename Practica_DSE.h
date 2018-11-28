@@ -14,13 +14,13 @@ const char PIN_LED_LISTO = 3;
 const char PIN_LED_EJECUTANDO = 4;
 const char PIN_LED_TERMINADO = 5;
 const char PIN_ZUMBADOR = 6;
-const char PIN_LDR = 7;
+const char PIN_LDR = 3;
 const char PIN_BOTON = 8;
 
 /**
  * Variables de control del pintando
  */
-const double TIEMPO_PINTADO = 0.0;          // Tiempo necesario para realizar el pintando
+const double TIEMPO_PINTADO = 10000.0;      // Tiempo necesario para realizar el pintando
 const short TIEMPO_FINALIZACION = 200;      /* Delay utilizado al final del pintado para garantizar
                                             que los servos vuelven a su posicion por defecto */
 
@@ -50,7 +50,7 @@ const int ZUMBADOR_FRECUENCIA = 0;              // Frecuencia del sonido emitido
 /**
  * Valores de control del LDR
  */
-const short LDR_HAY_LUZ = 250;              // Valor umbral que indica si se percibe luz
+const short LDR_HAY_LUZ = 150;              // Valor umbral que indica si se percibe luz
 const short LDR_NO_HAY_LUZ = 40;            // Valor umbral que indica si no se percibe luz
 const short DELAY_BLOQUEADO = 500;          /* Cuanto delay se realiza dentro de bloqueado_f(),
                                             con el objetivo de no leer constantemente el LDR */
@@ -82,6 +82,7 @@ void error_f();         // Callback que ejecuta el estado error
 
 void mover_motor(Servo servo, char pin, int angulo);
 void abortar();
+void print_double(double val, unsigned int precision);    // Fuente: http://forum.arduino.cc/index.php?topic=44216.0
 
 /**
  * Variables del sistema
@@ -89,7 +90,7 @@ void abortar();
 // Array que almacena los punteros a cada callback
 void (*funciones_estados[n_estados])() = {inicio_f, listo_f, en_espera_f, pintando_f,
                                           bloqueado_f, terminado_f, error_f};
-char estado = inicio;               // Almacena el estado actual de la maquina
+int estado = inicio;               // Almacena el estado actual de la maquina
 char inicializado = 0;              // 0: El sistema no se ha inicializado. 1: Si lo ha hecho
 /// Objetos para el control de los motores
 Servo servo_base;
