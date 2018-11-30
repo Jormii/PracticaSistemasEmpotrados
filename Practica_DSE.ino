@@ -13,7 +13,8 @@ void inicio_f()
   pinMode(PIN_MOTOR_BRAZO, INPUT);
   pinMode(PIN_MOTOR_SPRAY, INPUT);
   pinMode(PIN_MOTOR_BASE, INPUT);
-  pinMode(PIN_BOTON, INPUT);
+  pinMode(PIN_BOTON, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(PIN_BOTON), int_boton, RISING);
   pinMode(PIN_LED_LISTO, OUTPUT);
   pinMode(PIN_LED_EJECUTANDO, OUTPUT);
   pinMode(PIN_LED_TERMINADO, OUTPUT);
@@ -49,15 +50,6 @@ void listo_f()
     estado = en_espera;
     return;
   }
-
-  /// Meter codigo para comprobar posibles errores electro-mecanicos del boton
-  // Si se pulsa el boton, pasar al estado pintando
-  if (digitalRead(PIN_BOTON) == HIGH)
-  {
-    digitalWrite(PIN_LED_EJECUTANDO, HIGH);
-    digitalWrite(PIN_LED_LISTO, LOW);
-    estado = pintando;
-  }
 }
 
 void en_espera_f()
@@ -77,12 +69,12 @@ void pintando_f()
 {
   Serial.println("Ejecutando pintando_f");
 
-  unsigned long t_ejecucion = 0.0;    // Tiempo que lleva pintando el programa
-  unsigned long t0 = 0;               /* t0 y tF se usan para medir el tiempo transcurrido entre
+  unsigned long t_ejecucion = 0.0; // Tiempo que lleva pintando el programa
+  unsigned long t0 = 0;            /* t0 y tF se usan para medir el tiempo transcurrido entre
                                         iteraciones del bucle. Almacenan microsegundos */
   unsigned long tF = 0.0;
-  unsigned long elapsed_ms = 0.0;     // Diferencia entre t0 y tF en milisegundos
-  int clamp = 0;                      /* Variable auxiliar que se utiliza para ajustar el
+  unsigned long elapsed_ms = 0.0; // Diferencia entre t0 y tF en milisegundos
+  int clamp = 0;                  /* Variable auxiliar que se utiliza para ajustar el
                                         angulo del brazo */
 
   // Se inicializan las variables de control para los angulos
@@ -105,14 +97,14 @@ void pintando_f()
       analogWrite(PIN_ZUMBADOR, ZUMBADOR_FRECUENCIA);
       mover_motor(servo_spray, PIN_MOTOR_SPRAY, ANGULO_SPRAY_NO_PINTAR);
       estado = bloqueado;
-      bloqueado_f();      /* Para no perder el progreso del bucle, se llama directamente
+      bloqueado_f(); /* Para no perder el progreso del bucle, se llama directamente
                                 a la callback */
       mover_motor(servo_spray, PIN_MOTOR_SPRAY, ANGULO_SPRAY_PINTAR);
-      t0 = tF;    // t0 y tF se igualan para ignorar el tiempo transcurrido en el bloqueo
+      t0 = tF; // t0 y tF se igualan para ignorar el tiempo transcurrido en el bloqueo
     }
 
-    elapsed_ms = (tF - t0) / 1000;  // Se calcula el tiempo transcurrido
-    t_ejecucion += elapsed_ms;       // Se actualiza el tiempo de ejecucion. ¿Precision adecuada?
+    elapsed_ms = (tF - t0) / 1000; // Se calcula el tiempo transcurrido
+    t_ejecucion += elapsed_ms;     // Se actualiza el tiempo de ejecucion. ¿Precision adecuada?
 
     t0 = micros();
 
@@ -124,7 +116,7 @@ void pintando_f()
 
     brazo_angulo_actual += signo_brazo * angulo_recorrido;
     clamp = constrain(brazo_angulo_actual, ANGULO_BRAZO_ABAJO, ANGULO_BRAZO_ARRIBA);
-    if (clamp != brazo_angulo_actual)   // Si el brazo ha excedido sus angulos
+    if (clamp != brazo_angulo_actual) // Si el brazo ha excedido sus angulos
     {
       signo_brazo = -1 * signo_brazo;
     }
@@ -166,7 +158,7 @@ void terminado_f()
   mover_motor(servo_spray, PIN_MOTOR_SPRAY, ANGULO_SPRAY_NO_PINTAR);
   mover_motor(servo_base, PIN_MOTOR_BASE, ANGULO_BASE_DEFECTO);
   mover_motor(servo_brazo, PIN_MOTOR_BRAZO, ANGULO_BRAZO_DEFECTO);
-  delay(TIEMPO_FINALIZACION);     // Para asegurar que todo vuelve a su lugar
+  delay(TIEMPO_FINALIZACION); // Para asegurar que todo vuelve a su lugar
   digitalWrite(PIN_LED_TERMINADO, LOW);
 
   // Volver al estado en_espera
@@ -180,6 +172,16 @@ void error_f()
 
   Serial.println("Error: El sistema no deberia alcanzar el estado error");
   abortar();
+}
+
+void int_boton()
+{
+  Serial.println("Se ha pulsado el boton");
+  if (estado == listo)
+  {
+    Serial.println("Se va a pasar al estado pintando");
+    estado = pintando;
+  }
 }
 
 void mover_motor(Servo servo, char pin, int angulo)
@@ -201,29 +203,30 @@ void abortar()
   mover_motor(servo_base, PIN_MOTOR_BASE, ANGULO_BASE_DEFECTO);
   mover_motor(servo_brazo, PIN_MOTOR_BRAZO, ANGULO_BRAZO_DEFECTO);
   mover_motor(servo_spray, PIN_MOTOR_SPRAY, ANGULO_SPRAY_PINTAR);
-  delay(UINT_MAX);  // No existe una instruccion halt o stop
+  delay(UINT_MAX); // No existe una instruccion halt o stop
 }
 
-void print_double(double val, unsigned int precision) {
+void print_double(double val, unsigned int precision)
+{
   // prints val with number of decimal places determine by precision
   // NOTE: precision is 1 followed by the number of zeros for the desired number of decimial places
   // example: printDouble( 3.1415, 100); // prints 3.14 (two decimal places)
 
-  Serial.print (int(val));  //prints the int part
-  Serial.print("."); // print the decimal point
+  Serial.print(int(val)); //prints the int part
+  Serial.print(".");      // print the decimal point
   unsigned int frac;
   if (val >= 0)
     frac = (val - int(val)) * precision;
   else
-    frac = (int(val) - val ) * precision;
+    frac = (int(val) - val) * precision;
   int frac1 = frac;
-  while ( frac1 /= 10 )
+  while (frac1 /= 10)
     precision /= 10;
   precision /= 10;
-  while (  precision /= 10)
+  while (precision /= 10)
     Serial.print("0");
 
-  Serial.println(frac, DEC) ;
+  Serial.println(frac, DEC);
 }
 
 void setup()
