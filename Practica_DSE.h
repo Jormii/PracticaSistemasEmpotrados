@@ -13,7 +13,7 @@ const char PIN_MOTOR_BRAZO = 5;
 const char PIN_MOTOR_SPRAY = 6;
 const char PIN_MOTOR_BASE = 7;
 const char PIN_LED_LISTO = 10;
-const char PIN_LED_EJECUTANDO = 11;
+const char PIN_LED_PINTANDO = 11;
 const char PIN_LED_TERMINADO = 12;
 
 /// Pines analogicos

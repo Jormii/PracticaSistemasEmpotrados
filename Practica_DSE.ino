@@ -2,24 +2,23 @@
 
 void inicio_f()
 {
+  Serial.println("Ejecutando \"inicio_f()\"");
+
   // Si ya se habia inicializado el sistema, abortar
   if (inicializado)
   {
-    Serial.println("Error: El programa no deberia alcanzar el estado inicio una vez inicializado");
+    Serial.println("Error: El programa no deberia alcanzar el estado \"inicio\" una vez inicializado");
     abortar();
   }
 
   // Inicializar los pines
-  pinMode(PIN_MOTOR_BRAZO, INPUT);
-  pinMode(PIN_MOTOR_SPRAY, INPUT);
-  pinMode(PIN_MOTOR_BASE, INPUT);
   pinMode(PIN_BOTON, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(PIN_BOTON), int_boton, RISING);
   pinMode(PIN_LED_LISTO, OUTPUT);
-  pinMode(PIN_LED_EJECUTANDO, OUTPUT);
+  pinMode(PIN_LED_PINTANDO, OUTPUT);
   pinMode(PIN_LED_TERMINADO, OUTPUT);
 
-  // Mover los motores a sus posiciones por defecto
+  // Mover los motores a sus posiciones iniciales
   mover_motor(servo_base, PIN_MOTOR_BASE, ANGULO_BASE_DEFECTO);
   mover_motor(servo_brazo, PIN_MOTOR_BRAZO, ANGULO_BRAZO_DEFECTO);
   mover_motor(servo_spray, PIN_MOTOR_SPRAY, ANGULO_SPRAY_NO_PINTAR);
@@ -39,22 +38,21 @@ void inicio_f()
 
 void listo_f()
 {
-  Serial.println("Ejecutando listo");
-
+  Serial.println("Ejecutando \"listo_f\"");
   Serial.println(analogRead(PIN_LDR));
-  // Si el LDR recibe luz, pasar al estado en_espera
+
+  // Si el LDR recibe luz, pasar al estado "en_espera"
   if (analogRead(PIN_LDR) >= LDR_HAY_LUZ)
   {
     digitalWrite(PIN_LED_LISTO, LOW);
     analogWrite(PIN_ZUMBADOR, ZUMBADOR_FRECUENCIA);
     estado = en_espera;
-    return;
   }
 }
 
 void en_espera_f()
 {
-  Serial.println("Ejecutando en_espera_f");
+  Serial.println("Ejecutando \"en_espera_f()\"");
 
   // Si el LDR no detecta luz, pasar al estado listo
   if (analogRead(PIN_LDR) <= LDR_NO_HAY_LUZ)
@@ -67,7 +65,7 @@ void en_espera_f()
 
 void pintando_f()
 {
-  Serial.println("Ejecutando pintando_f");
+  Serial.println("Ejecutando \"pintando_f()\"");
 
   unsigned long t_ejecucion = 0.0; // Tiempo que lleva pintando el programa
   unsigned long t0 = 0;            /* t0 y tF se usan para medir el tiempo transcurrido entre
@@ -92,19 +90,19 @@ void pintando_f()
     // Si se percibe luz, pasar al estado bloqueado
     if (analogRead(PIN_LDR) >= LDR_HAY_LUZ)
     {
-      Serial.println("Se ha detectado luz. Pasando al estado bloqueado");
-      digitalWrite(PIN_LED_EJECUTANDO, LOW);
+      Serial.println("Se ha detectado luz. Pasando al estado \"bloqueado\"");
+      digitalWrite(PIN_LED_PINTANDO, LOW);
       analogWrite(PIN_ZUMBADOR, ZUMBADOR_FRECUENCIA);
       mover_motor(servo_spray, PIN_MOTOR_SPRAY, ANGULO_SPRAY_NO_PINTAR);
       estado = bloqueado;
-      bloqueado_f(); /* Para no perder el progreso del bucle, se llama directamente
+      bloqueado_f();          /* Para no perder el progreso del bucle, se llama directamente
                                 a la callback */
       mover_motor(servo_spray, PIN_MOTOR_SPRAY, ANGULO_SPRAY_PINTAR);
       t0 = tF; // t0 y tF se igualan para ignorar el tiempo transcurrido en el bloqueo
     }
 
     elapsed_ms = (tF - t0) / 1000; // Se calcula el tiempo transcurrido
-    t_ejecucion += elapsed_ms;     // Se actualiza el tiempo de ejecucion. ¿Precision adecuada?
+    t_ejecucion += elapsed_ms;     // Se actualiza el tiempo de ejecucion. ¿PRECISION ADECUADA?
 
     t0 = micros();
 
@@ -126,33 +124,36 @@ void pintando_f()
     mover_motor(servo_base, PIN_MOTOR_BASE, base_angulo_actual);
     mover_motor(servo_brazo, PIN_MOTOR_BRAZO, brazo_angulo_actual);
 
+    Serial.println(base_angulo_actual);
+    Serial.println(brazo_angulo_actual);
+
     tF = micros();
   }
 
   // Finalizar el pintado
   digitalWrite(PIN_LED_TERMINADO, HIGH);
-  digitalWrite(PIN_LED_EJECUTANDO, LOW);
+  digitalWrite(PIN_LED_PINTANDO, LOW);
   estado = terminado;
 }
 
 void bloqueado_f()
 {
-  Serial.println("Ejecutando bloqueado_f");
+  Serial.println("Ejecutando \"bloqueado_f()\"");
 
   // No proseguir hasta que el LDR no perciba oscuridad
   while (analogRead(PIN_LDR) >= LDR_HAY_LUZ)
   {
     delay(DELAY_BLOQUEADO); // Delay para que no se realice polling constante
   }
-  Serial.println("Se ha detectado oscuridad. Pasando al estado pintando");
-  digitalWrite(PIN_LED_EJECUTANDO, HIGH);
+  Serial.println("Se ha detectado oscuridad. Pasando al estado \"pintando\"");
+  digitalWrite(PIN_LED_PINTANDO, HIGH);
   analogWrite(PIN_ZUMBADOR, 0);
   estado = pintando;
 }
 
 void terminado_f()
 {
-  Serial.println("Ejecutando terminado_f");
+  Serial.println("Ejecutando \"terminado_f()\"");
 
   // Devolver los motores a sus posiciones por defecto
   mover_motor(servo_spray, PIN_MOTOR_SPRAY, ANGULO_SPRAY_NO_PINTAR);
@@ -162,15 +163,15 @@ void terminado_f()
   digitalWrite(PIN_LED_TERMINADO, LOW);
 
   // Volver al estado en_espera
-  Serial.println("Pasando al estado en_espera");
+  Serial.println("Pasando al estado \"en_espera\"");
   estado = en_espera;
 }
 
 void error_f()
 {
-  Serial.println("Ejecutando error_f");
+  Serial.println("Ejecutando \"error_f()\"");
 
-  Serial.println("Error: El sistema no deberia alcanzar el estado error");
+  Serial.println("Error: El sistema no deberia alcanzar el estado \"error\"");
   abortar();
 }
 
@@ -179,7 +180,9 @@ void int_boton()
   Serial.println("Se ha pulsado el boton");
   if (estado == listo)
   {
-    Serial.println("Se va a pasar al estado pintando");
+    Serial.println("Se va a pasar al estado \"pintando\"");
+    digitalWrite(PIN_LED_LISTO, LOW);
+    digitalWrite(PIN_LED_PINTANDO, HIGH);
     estado = pintando;
   }
 }
@@ -188,22 +191,23 @@ void mover_motor(Servo servo, char pin, int angulo)
 {
   servo.attach(pin);
   servo.write(angulo);
-  delay(MOTOR_DELAY); // Breve delay para asegurar que el motor alcanza el angulo indicado
+  delay(MOTOR_DELAY); // Breve delay para asegurar que el motor alcanza el angulo argumento
   servo.detach();
 }
 
 void abortar()
 {
   Serial.println("Abortando ejecucion");
+
   /* Encender todos los leds para mostrar el error fisicamente y devolver los motores
     a sus posiciones por defecto. Posteriormente, acabar la ejecucion */
-  digitalWrite(PIN_LED_EJECUTANDO, HIGH);
+  digitalWrite(PIN_LED_PINTANDO, HIGH);
   digitalWrite(PIN_LED_LISTO, HIGH);
   digitalWrite(PIN_LED_TERMINADO, HIGH);
   mover_motor(servo_base, PIN_MOTOR_BASE, ANGULO_BASE_DEFECTO);
   mover_motor(servo_brazo, PIN_MOTOR_BRAZO, ANGULO_BRAZO_DEFECTO);
   mover_motor(servo_spray, PIN_MOTOR_SPRAY, ANGULO_SPRAY_PINTAR);
-  delay(UINT_MAX); // No existe una instruccion halt o stop
+  delay(UINT_MAX); // No existe una instruccion halt, stop o exit. Se utiliza un delay enorme
 }
 
 void print_double(double val, unsigned int precision)
@@ -239,5 +243,6 @@ void loop()
 {
   // Llamar a la callback correspondiente al estado actual
   (*funciones_estados[estado])();
-  delay(1000);
+  
+  delay(1000);  // DEBUG. BORRAR
 }
