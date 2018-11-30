@@ -9,13 +9,13 @@
 */
 const char PIN_MOTOR_BRAZO = 0;
 const char PIN_MOTOR_SPRAY = 1;
-const char PIN_MOTOR_BASE = 2;
+const char PIN_MOTOR_BASE = 8;
 const char PIN_LED_LISTO = 3;
 const char PIN_LED_EJECUTANDO = 4;
 const char PIN_LED_TERMINADO = 5;
 const char PIN_ZUMBADOR = 6;
 const char PIN_LDR = 3;
-const char PIN_BOTON = 8; // Debe ser 2 o 3 para que funcione la interrupcion
+const char PIN_BOTON = 2; // Debe ser 2 o 3 para que funcione la interrupcion
 
 /**
    Variables de control del pintando
